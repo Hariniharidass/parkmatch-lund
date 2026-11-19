@@ -1,0 +1,4 @@
+<script lang="ts">
+ let {activeView,onChangeView,onOpenFilters}:{activeView:'find'|'municipality';onChangeView:(view:'find'|'municipality')=>void;onOpenFilters:()=>void}=$props();
+</script>
+<header class="header"><div class="brand"><span class="brand-mark" aria-hidden="true">P</span><div><strong>{activeView==='find'?'ParkMatch Lund':'Lund Park Insights'}</strong><small>{activeView==='find'?'Find your next-door park.':'Explore park facilities, access and greenery'}</small></div></div><nav aria-label="Primary navigation"><button class:active={activeView==='find'} onclick={()=>onChangeView('find')}>Find a Park</button><button class:active={activeView==='municipality'} onclick={()=>onChangeView('municipality')}>Municipality View</button></nav><button class="filter-trigger" onclick={onOpenFilters} aria-label="Open filters">Filters</button></header>

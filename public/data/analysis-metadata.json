@@ -1,0 +1,20 @@
+{
+"type": "FeatureCollection",
+"name": "analysis_metadata",
+"features": [
+{"type":"Feature","properties":{"key":"description","value":"Provisional persona quality, category breakdowns and demographic-adjusted scores for 172 Lund park polygons."},"geometry":null},
+{"type":"Feature","properties":{"key":"primary_layer","value":"parks"},"geometry":null},
+{"type":"Feature","properties":{"key":"crs","value":"EPSG:3006"},"geometry":null},
+{"type":"Feature","properties":{"key":"score_scale","value":"0–100"},"geometry":null},
+{"type":"Feature","properties":{"key":"quality_direction","value":"higher is better"},"geometry":null},
+{"type":"Feature","properties":{"key":"priority_direction","value":"demographic_priority_points: higher = more priority; demographic_adjusted_index: lower = more priority"},"geometry":null},
+{"type":"Feature","properties":{"key":"category_interpretation","value":"The category scores are the existing shared category measures; persona profiles differ by their category weights. Young accessibility is available for the spider chart but has zero weight in its overall score."},"geometry":null},
+{"type":"Feature","properties":{"key":"coverage_interpretation","value":"Coverage is the proportion of intended evidence available. All quality and demographic scores are provisional; mapped zero is not verified absence. Unknown values are null."},"geometry":null},
+{"type":"Feature","properties":{"key":"demographic_model","value":{"status":"provisional","radius_m":300,"distance":"straight-line from population-cell centre to park polygon","park_count":172,"scored_parks":170,"unscored_parks":2,"years":{"age_shares":2025,"population_grid":2024,"urban_boundary":2023},"formulas":{"group_gap_points":"age_share_percent * (100 - persona_score) / 100","unmet_need_points":"sum of the three group gap contributions; larger = greater priority","need_adjusted_index":"100 - unmet_need_points; lower = greater priority","age_weighted_persona_quality":"sum(age_share_percent * persona_score) / sum(age_share_percent)"},"limitations":["DeSO age shares are neighbourhood averages, not observed individual ages in each grid cell","Age 0–14 approximates the family persona; age 15–29 approximates the student/young persona; age 65+ approximates the senior/wheelchair persona, and does not identify wheelchair users","Other age groups do not contribute to the gap; this is not overall quality or evidence of need among them","Population in overlapping park catchments is counted for each park; catchment population is limited to the urban study boundary","Park scores are provisional; group shares and population do not identify park users, travel routes, barriers or actual access","All three group contributions are equally valued per percentage point of population; smaller groups may still have important needs"]}},"geometry":null},
+{"type":"Feature","properties":{"key":"age_year","value":"2025"},"geometry":null},
+{"type":"Feature","properties":{"key":"population_grid_year","value":"2024"},"geometry":null},
+{"type":"Feature","properties":{"key":"urban_boundary_year","value":"2023"},"geometry":null},
+{"type":"Feature","properties":{"key":"limitations","value":"DeSO average ages are estimates for nearby cells; 0–14 approximates family, 15–29 approximates young, and 65+ approximates pensioner, not disability. 30–64 is not evaluated. Straight-line catchments can overlap and do not establish access or actual park use."},"geometry":null},
+{"type":"Feature","properties":{"key":"input_sha256","value":{"data/processed/lund_park_revised_scores.gpkg":"f1e6f77c0803b7d5f209a71bd83850fcdb30eca93b11dc54c03879f9112e06f5","outputs/demographic-park-priority-2026-11-19/demographic_park_priority.gpkg":"a7fd0ab2014310997f7214700488a9b2288eea145737b23eed0cbe74c1eba61f","outputs/revised-scoring-2026-11-19/calculation_metadata.json":"804d75391ef8888f72127bfc2d2c0192123a7c1f09f083d571a715c86dd97d2f","outputs/demographic-park-priority-2026-11-19/metadata.json":"6bdd5d9f5f6c173b6e6dcc4c78ef6046a537dfc8651758932055cc2b5f056174"}},"geometry":null}
+]
+}
