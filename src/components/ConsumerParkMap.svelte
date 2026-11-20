@@ -1,6 +1,59 @@
 <script lang="ts">
- import {onMount} from 'svelte';import L from 'leaflet';import type {Feature,GeoJsonObject} from 'geojson';import type {RealParkFeature} from '../types/municipality';import {parkName,scoreColor,valueFor} from '../lib/realMunicipality';
- let {parks,selectedId,onHover,onLeave,onSelect}:{parks:RealParkFeature[];selectedId:string|null;onHover:(p:RealParkFeature)=>void;onLeave:()=>void;onSelect:(p:RealParkFeature)=>void}=$props();let container:HTMLDivElement;let map:L.Map;let layer:L.GeoJSON;
- function draw(){if(!map)return;layer?.remove();const byId=new Map(parks.map(p=>[p.properties.park_id,p]));layer=L.geoJSON({type:'FeatureCollection',features:parks} as GeoJsonObject,{style:feature=>{const park=byId.get(String(feature?.properties?.park_id));return{color:park?.properties.park_id===selectedId?'#173e34':'#fff',weight:park?.properties.park_id===selectedId?3:1,fillColor:scoreColor(park?valueFor(park,'general_score'):null),fillOpacity:.72}},onEachFeature:(feature:Feature,shape)=>{const park=byId.get(String(feature.properties?.park_id));if(!park)return;const path=shape as L.Path;shape.bindTooltip(`${parkName(park)} · General score ${valueFor(park,'general_score')?.toFixed(1)??'Unknown'}`,{sticky:true});shape.on('mouseover',()=>{path.setStyle({weight:3,color:'#173e34',fillOpacity:.9});onHover(park)});shape.on('mouseout',()=>{layer.resetStyle(shape);onLeave()});shape.on('click',()=>onSelect(park))}}).addTo(map)}
- onMount(()=>{map=L.map(container,{zoomControl:false}).setView([55.7047,13.1910],13);L.control.zoom({position:'bottomright'}).addTo(map);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',maxZoom:19}).addTo(map);draw();const observer=new ResizeObserver(()=>map.invalidateSize());observer.observe(container);return()=>{observer.disconnect();map.remove()}});$effect(()=>{parks;selectedId;draw()});
-</script><div class="map-shell real-map-shell"><div class="score-legend" aria-label="General quality score legend"><strong>General quality</strong><span><i class="unknown"></i>Unknown</span><span><i class="low"></i>0–24</span><span><i class="fair"></i>25–49</span><span><i class="good"></i>50–74</span><span><i class="high"></i>75–100</span></div><div class="map" bind:this={container} aria-label="Interactive map of real Lund park polygons"></div></div>
+ import {onMount} from 'svelte';
+ import L from 'leaflet';
+ import type {Feature,GeoJsonObject} from 'geojson';
+ import type {AmenityFeature,RealParkFeature} from '../types/municipality';
+ import {parkName,scoreColor,valueFor} from '../lib/realMunicipality';
+
+ let {parks,amenities,selectedId,onHover,onLeave,onSelect}:{parks:RealParkFeature[];amenities:AmenityFeature[];selectedId:string|null;onHover:(p:RealParkFeature)=>void;onLeave:()=>void;onSelect:(p:RealParkFeature)=>void}=$props();
+ let container:HTMLDivElement;let map:L.Map;let layer:L.GeoJSON;let amenityLayer:L.LayerGroup;let lastParkSignature='';let lastSelectedId:string|null=null;
+ let knownScores=$derived(parks.map(park=>valueFor(park,'general_score')).filter((score):score is number=>score!==null));
+ let lowestScore=$derived(knownScores.length?Math.min(...knownScores):null);
+ let highestScore=$derived(knownScores.length?Math.max(...knownScores):null);
+ let midpointScore=$derived(lowestScore!==null&&highestScore!==null?(lowestScore+highestScore)/2:null);
+ const legendValue=(score:number|null)=>score===null?'—':score.toFixed(1);
+ const amenitySymbols:Record<string,string>={benches:'🪑',toilets:'🚻',drinking_water:'🚰',fountains:'⛲',playgrounds:'🛝',sports_pitches:'⚽',fitness_stations:'🏋',picnic_tables:'♨',picnic_sites:'🧺',waste_bins:'♻',bicycle_parking:'🚲',bike_services:'🔧',shelters:'⌂',food_and_drink:'☕',bbqs:'🔥',dog_parks:'🐕',information:'ℹ',viewpoints:'◉',swimming_pools:'🏊',disc_golf:'🥏',artworks:'◆',historic_features:'★',vending_machines:'▣'};
+ const amenityIcon=(category:string|null)=>L.divIcon({className:'osm-amenity-icon',html:`<span>${amenitySymbols[category??'']??'•'}</span>`,iconSize:[28,28],iconAnchor:[14,14],tooltipAnchor:[0,-15]});
+
+ function draw(){
+  if(!map)return;
+  layer?.remove();
+  amenityLayer?.remove();
+  const byId=new Map(parks.map(p=>[p.properties.park_id,p]));
+  layer=L.geoJSON({type:'FeatureCollection',features:parks} as GeoJsonObject,{
+   style:feature=>{
+    const park=byId.get(String(feature?.properties?.park_id));
+    return {color:park?.properties.park_id===selectedId?'#d17a22':'#173e34',weight:park?.properties.park_id===selectedId?4:2,fillColor:scoreColor(park?valueFor(park,'general_score'):null,lowestScore??0,highestScore??100),fillOpacity:.84};
+   },
+   onEachFeature:(feature:Feature,shape)=>{
+    const park=byId.get(String(feature.properties?.park_id));if(!park)return;
+    const path=shape as L.Path;
+    shape.bindTooltip(`${parkName(park)} · General score ${valueFor(park,'general_score')?.toFixed(1)??'Unknown'}`,{sticky:true});
+    shape.on('mouseover',()=>{path.setStyle({weight:4,color:'#d17a22',fillOpacity:.94});onHover(park)});
+    shape.on('mouseout',()=>{layer.resetStyle(shape);onLeave()});
+    shape.on('click',()=>onSelect(park));
+   }
+  }).addTo(map);
+  const signature=parks.map(park=>park.properties.park_id).sort().join('|');
+  if(signature!==lastParkSignature&&parks.length>0){const bounds=layer.getBounds();if(bounds.isValid())map.fitBounds(bounds,{padding:[36,36],maxZoom:15});}
+  lastParkSignature=signature;
+  if(selectedId&&selectedId!==lastSelectedId){const selectedPark=byId.get(selectedId);if(selectedPark){const bounds=L.geoJSON(selectedPark as GeoJsonObject).getBounds();if(bounds.isValid())map.fitBounds(bounds,{padding:[56,56],maxZoom:17});}}
+  lastSelectedId=selectedId;
+  amenityLayer=L.layerGroup();
+  if(selectedId){for(const amenity of amenities.filter(item=>item.properties.park_ids.includes(selectedId))){const [longitude,latitude]=amenity.geometry.coordinates;const label=amenity.properties.category?.replaceAll('_',' ')??amenity.properties.amenity??'Amenity';const marker=L.marker([latitude,longitude],{icon:amenityIcon(amenity.properties.category),keyboard:true,title:amenity.properties.name??label});marker.bindTooltip(`<strong>${amenity.properties.name??label}</strong><br>${label}`,{direction:'top'});marker.addTo(amenityLayer);}}
+  amenityLayer.addTo(map);
+ }
+
+ onMount(()=>{map=L.map(container,{zoomControl:false}).setView([55.7047,13.1910],13);L.control.zoom({position:'bottomright'}).addTo(map);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',maxZoom:19}).addTo(map);draw();const observer=new ResizeObserver(()=>map.invalidateSize());observer.observe(container);return()=>{observer.disconnect();map.remove()}});
+ $effect(()=>{parks;amenities;selectedId;draw()});
+</script>
+
+<div class="map-shell real-map-shell">
+ <div class="score-legend continuous" aria-label="General quality colors normalized from the lowest to highest displayed score">
+  <strong>Relative general quality</strong>
+  <div class="score-gradient" aria-hidden="true"></div>
+  <div class="gradient-labels"><span>{legendValue(lowestScore)} · Lowest</span><span>{legendValue(midpointScore)}</span><span>{legendValue(highestScore)} · Highest</span></div>
+  <span class="unknown-label"><i class="unknown"></i>Unknown</span>
+ </div>
+ <div class="map" bind:this={container} aria-label="Interactive map of real Lund park polygons"></div>
+</div>

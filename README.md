@@ -4,19 +4,22 @@ A Svelte + TypeScript + Vite hackathon MVP for filtering fictional demonstration
 
 ## Run locally
 
-```powershell
-npm.cmd install
-npm.cmd run dev
+From Windows Command Prompt (`cmd`), run:
+
+```bat
+cd C:\Users\hello\Desktop\SESAC-Hackathon-2026\parkmatch-web
+npm install
+npm run dev
 ```
 
-Open the URL printed by Vite (normally `http://localhost:5173`). On systems where PowerShell permits npm scripts, `npm` works in place of `npm.cmd`.
+Open the URL printed by Vite (normally `http://localhost:5173`). Keep the Command Prompt window open while using the app. Press `Ctrl+C` to stop the development server.
 
 ## Verify
 
-```powershell
-npm.cmd run check
-npm.cmd test
-npm.cmd run build
+```bat
+npm run check
+npm test
+npm run build
 ```
 
 ## Data integration

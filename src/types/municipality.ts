@@ -1,6 +1,4 @@
-export type Persona = 'young' | 'family' | 'pensioner';
-export type EvidenceFilter = 'all' | 'complete' | 'incomplete';
-export type DemographicFilter = 'all' | 'available' | 'unknown';
+export type Persona = 'general' | 'young' | 'family' | 'pensioner';
 export type InvestigationSort = 'priority' | 'score' | 'name';
 
 export interface RealParkProperties {
@@ -18,7 +16,10 @@ export interface RealParkProperties {
 export interface PolygonGeometry { type:'Polygon'|'MultiPolygon'; coordinates: unknown[]; }
 export interface RealParkFeature { type:'Feature'; geometry:PolygonGeometry; properties:RealParkProperties; }
 export interface RealParkCollection { type:'FeatureCollection'; features:RealParkFeature[]; }
+export interface AmenityProperties { osm_id:string|null;name:string|null;category:string|null;amenity:string|null;leisure:string|null;access:string|null;wheelchair:string|null;opening_hours:string|null;sport:string|null;park_ids:string[];included_in_park_counts:boolean|number;[key:string]:string|string[]|number|boolean|null; }
+export interface AmenityFeature { type:'Feature';geometry:{type:'Point';coordinates:[number,number]};properties:AmenityProperties; }
+export interface AmenityCollection { type:'FeatureCollection';features:AmenityFeature[]; }
 export interface CategoryWeight { persona:Persona; category:string; label:string; spider_order:number; overall_weight_pct:number; score_field:string; coverage_field:string; }
 export interface CategoryWeightFeature { type:'Feature'; geometry:null; properties:CategoryWeight; }
 export interface CategoryWeightCollection { type:'FeatureCollection'; features:CategoryWeightFeature[]; }
-export interface MunicipalityRealFilters { minScore:number; maxScore:number; evidence:EvidenceFilter; demographics:DemographicFilter; }
+export interface MunicipalityRealFilters { minScore:number; maxScore:number; }
