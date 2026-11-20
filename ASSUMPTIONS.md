@@ -58,6 +58,14 @@ This document records transformations and presentation decisions applied between
 - The municipality left panel retains the selected profile and score-range controls.
 - The selected park's Mapped facilities section is shown in the left panel. It is informational and does not filter municipality results.
 
+## Demographic priority map
+
+- Municipality demographic-priority colors use the original `demographic_adjusted_index` field.
+- A lower adjusted index means higher potential priority and is shown in red; a higher index means lower priority and is shown in green.
+- Colors are normalized to the lowest and highest known adjusted index in the currently displayed result set. Unknown indices remain grey.
+- The map mode can switch between demographic priority and the selected profile quality score; this changes presentation only and does not rewrite either value.
+- Selecting an investigation card focuses the map on that park and exposes coordinated context: facility counts in the left panel, detailed scores and priority fields in the right panel, and amenity locations on the map. The center panel avoids duplicating those details.
+
 ## Amenity counts and locations
 
 - Counts shown in the municipality left-panel facility summary come directly from the GeoPackage park count fields.
