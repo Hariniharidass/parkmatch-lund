@@ -57,6 +57,7 @@ This document records transformations and presentation decisions applied between
 - Evidence-completeness and demographic-availability filters were removed from the municipality left panel; their underlying fields remain available in the exported data and summary/detail displays.
 - The municipality left panel retains the selected profile and score-range controls.
 - The selected park's Mapped facilities section is shown in the left panel. It is informational and does not filter municipality results.
+- Reset municipality view restores the General profile, 0–100 score range, demographic-priority ordering and map mode, and clears the selected park.
 
 ## Demographic priority map
 
@@ -74,8 +75,22 @@ This document records transformations and presentation decisions applied between
 - Marker symbols are selected from the amenity `category` value for visual recognition. The symbols are a UI representation and do not alter the underlying OpenStreetMap tags or GeoPackage records.
 - Both maps fit to changed result bounds, use strong dark outlines for results, and use an orange outline for the selected park.
 
-## Interpretation
+## Current limitations
 
 - Scores and coverage are presented as provisional model outputs, not verified statements about accessibility, quality, or facility availability.
 - Nearby demographics describe modelled 300 m straight-line catchments and are not observations of park visitors.
 - Relative map colors communicate ranking within the current visible set, not an absolute quality threshold.
+- Demographic priority is exploratory. It does not establish need, causality, funding priority, or an intervention recommendation.
+- Mapped amenities reflect the source OpenStreetMap/GeoPackage snapshot and may be missing, outdated, duplicated, inaccessible, seasonal, or incorrectly tagged.
+- A positive amenity count confirms only a mapped record linked to a park; it does not verify condition, capacity, opening hours, accessibility, or current availability.
+- Find a Park combines amenity-count filters with Family-profile category labels and displays Family-oriented model characteristics in its detail panel. It is not a personalized recommendation engine.
+- The exported park properties come from the current GeoPackage, while browser polygon geometry is retained from the existing `lund-parks.geojson`; the exporter assumes matching `park_id` values and unchanged park boundaries.
+- Source changes are not live. The export script must be rerun and the web assets redeployed after a GeoPackage update.
+- Amenity icons are displayed only for the selected park to avoid city-wide point clutter.
+- The application does not calculate walking routes, travel time, live occupancy, maintenance condition, or observed park usage.
+
+## Theme behavior
+
+- Light or dark mode changes presentation only; it does not change scores, filtering, sorting, priority, or map normalization.
+- Theme choice is stored in the current browser using `localStorage`. When no choice exists, the operating-system color preference is used.
+- Leaflet base-map tiles are visually dimmed in dark mode; the underlying OpenStreetMap imagery is not replaced with a separate dark tile source.

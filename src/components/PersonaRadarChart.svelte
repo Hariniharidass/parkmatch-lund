@@ -40,5 +40,5 @@
  $effect(()=>{park;weights;selectedPersona;if(canvas)render()});
 </script>
 
-{#if selectedPersona}<p class="radar-mode">Persona emphasis · contribution to overall score</p>{/if}
-<div class="persona-chart"><canvas bind:this={canvas} aria-label={selectedPersona?'Weighted six-category contribution chart for the selected persona':'Six-category persona comparison radar chart'}></canvas></div>
+{#if selectedPersona}<p class="radar-mode">{selectedPersona==='general'?'Equal-weight General profile':'Persona emphasis'} · category contribution points</p>{/if}
+<div class="persona-chart"><canvas bind:this={canvas} aria-label={selectedPersona?'Weighted six-category contribution chart for the selected profile':'Six-category profile comparison radar chart'}></canvas></div>
